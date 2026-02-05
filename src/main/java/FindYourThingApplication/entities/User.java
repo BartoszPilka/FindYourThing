@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
@@ -28,4 +30,14 @@ public class User
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
+    //helpful relation mapping
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Listing> listings;
+
+    @OneToMany(mappedBy = "founder")
+    private List<Review> reviewsReceived;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Item> itemsOwned;
 }

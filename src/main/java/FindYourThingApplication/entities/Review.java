@@ -20,10 +20,15 @@ public class Review
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Integer id;
-    @Column(name = "founder_id", nullable = false)
-    private Integer founderId;
-    @Column(name = "reviewer_id", nullable = false)
-    private Integer reviewerId;
+
+    @ManyToOne
+    @JoinColumn(name = "founder_id", nullable = false)
+    private User founder;
+
+    @ManyToOne
+    @JoinColumn(name = "reviewer_id", nullable = false)
+    private User reviewer;
+
     @Column(name = "grade", nullable = false)
     @Min(1)
     @Max(5)

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "message_rooms")
 @AllArgsConstructor
@@ -18,10 +20,20 @@ public class MessageRoom
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Integer id;
-    @Column(name = "listing_id", nullable = false)
-    private Integer listingId;
-    @Column(name = "listing_owner_id", nullable = false)
-    private Integer listingOwnerId;
-    @Column(name = "item_claimant_id", nullable = false)
-    private Integer itemClaimantId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "listing_id", nullable = false)
+    private Listing listing;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "listing_owner_id", nullable = false)
+    private User listingOwner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_claimant_id", nullable = false)
+    private User itemClaimant;
+
+    //useful connection
+    @OneToMany(mappedBy = "messageRoom", cascade = CascadeType.ALL)
+    private List<Message> messages;
 }

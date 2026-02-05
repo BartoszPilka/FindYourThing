@@ -20,14 +20,21 @@ public class Message
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
     private Integer id;
-    @Column(name = "message_room_id", nullable = false)
-    private Integer messageRoomId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "message_room_id", nullable = false)
+    private MessageRoom messageRoom;
+
     @Column(name = "content", nullable = false)
     private String content;
+
     @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
+
     @Column(name = "is_read", nullable = false)
     private boolean isRead;
-    @Column(name = "sender_id", nullable = false)
-    private Integer senderId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
 }

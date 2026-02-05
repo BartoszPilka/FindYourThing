@@ -20,15 +20,22 @@ public class Listing
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
     private Integer id;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ListingStatus status;
-    @Column(name = "item_id", nullable = false)
-    private Integer itemId;
-    @Column(name = "author_id", nullable = false)
-    private Integer authorId;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_id", referencedColumnName = "id", nullable = false, unique = true)
+    private Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
     @Column(name ="location", nullable = false, columnDefinition = "geography(Point,4326)")
     private Point location;
+
     @Column(name = "description", nullable = false)
     private String description;
 }

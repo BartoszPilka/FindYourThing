@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "items")
 @AllArgsConstructor
@@ -18,10 +20,19 @@ public class Item
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Integer id;
-    @Column(name = "founder_id", nullable = true)
-    private Integer founderId;
-    @Column(name = "owner_id", nullable = true)
-    private Integer ownerId;
-    @Column(name = "listing_id", nullable = false)
-    private Integer listingId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "founder_id", nullable = true)
+    private User founder;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = true)
+    private User owner;
+
+    @OneToOne(mappedBy = "item")
+    private Listing listing;
+
+    //useful connection
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<Image> images;
 }
