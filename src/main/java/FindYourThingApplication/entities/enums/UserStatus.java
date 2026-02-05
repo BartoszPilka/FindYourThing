@@ -1,4 +1,4 @@
-package FindYourThingApplication.entities;
+package FindYourThingApplication.entities.enums;
 
 public enum UserStatus
 {

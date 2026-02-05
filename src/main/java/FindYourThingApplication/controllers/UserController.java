@@ -1,6 +1,7 @@
 package FindYourThingApplication.controllers;
 
 import FindYourThingApplication.entities.User;
+import FindYourThingApplication.entities.enums.UserStatus;
 import FindYourThingApplication.entities.dto.UserRequest;
 import FindYourThingApplication.repositories.UserRepository;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class UserController
         user.setEmail(request.getEmail());
         user.setNickname(request.getNickname());
         user.setPassword(request.getPassword());
-        user.setStatus(request.getStatus());
+        user.setStatus(UserStatus.INACTIVE);
 
         userRepository.save(user);
         return user.getId();

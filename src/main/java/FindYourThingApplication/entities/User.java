@@ -1,5 +1,6 @@
 package FindYourThingApplication.entities;
 
+import FindYourThingApplication.entities.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

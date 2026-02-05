@@ -16,14 +16,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Wyłączenie CSRF dla REST API
                 .csrf(AbstractHttpConfigurer::disable)
-                // 2. Pozwolenie na dostęp do konkretnych ścieżek
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                // 3. Opcjonalnie: jeśli chcesz móc testować przez Basic Auth w przyszłości
                 .httpBasic(withDefaults());
 
         return http.build();
