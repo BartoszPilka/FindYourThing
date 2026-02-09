@@ -1,6 +1,7 @@
 package FindYourThingApplication.entities;
 
 import FindYourThingApplication.entities.enums.ListingStatus;
+import FindYourThingApplication.entities.enums.ListingType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,10 @@ public class Listing
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ListingStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private ListingType type;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id", referencedColumnName = "id", nullable = false, unique = true)

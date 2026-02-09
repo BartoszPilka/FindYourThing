@@ -1,4 +1,4 @@
-package FindYourThingApplication.entities.dto;
+package FindYourThingApplication.entities.dto.requests;
 
 import lombok.Getter;
 import lombok.Setter;

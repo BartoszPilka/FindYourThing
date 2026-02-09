@@ -2,7 +2,7 @@ package FindYourThingApplication.controllers;
 
 import FindYourThingApplication.entities.User;
 import FindYourThingApplication.entities.enums.UserStatus;
-import FindYourThingApplication.entities.dto.UserRequest;
+import FindYourThingApplication.entities.dto.requests.UserRequest;
 import FindYourThingApplication.repositories.UserRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

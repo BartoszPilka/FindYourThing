@@ -37,7 +37,7 @@ public class ReviewService
     }
 
     @Transactional
-    public Integer addReview(Integer reviewerId, Integer itemId, Integer grade, Integer founderId)
+    public Integer createReview(Integer reviewerId, Integer itemId, Integer grade, Integer founderId)
     {
         if(itemId == null)
             throw new IllegalArgumentException("ID of an item cannot be null");
