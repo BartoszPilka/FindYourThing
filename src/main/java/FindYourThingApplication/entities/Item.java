@@ -35,4 +35,7 @@ public class Item
     //useful connection
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<Image> images;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<Review> reviews;
 }

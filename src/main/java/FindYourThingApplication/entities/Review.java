@@ -33,4 +33,9 @@ public class Review
     @Min(1)
     @Max(5)
     private Integer grade;
+
+    //context
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
 }
