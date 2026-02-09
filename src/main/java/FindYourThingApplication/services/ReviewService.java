@@ -108,14 +108,12 @@ public class ReviewService
     }
 
     @Transactional
-    public void editReview(Integer reviewId, Integer reviewerId, Integer founderId, Integer grade)
+    public void editReview(Integer reviewId, Integer reviewerId, Integer grade)
     {
         if(reviewId == null)
             throw new IllegalArgumentException("ID of a review must not be null");
         if(reviewerId == null)
             throw new IllegalArgumentException("ID of a reviewer must not be null");
-        if(founderId == null)
-            throw new IllegalArgumentException("ID of a founder must not be null");
         if(grade == null || grade > 5 || grade < 1)
             throw new IllegalArgumentException("Grade must be from 1 to 5");
 
