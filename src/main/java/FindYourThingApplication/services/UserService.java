@@ -32,11 +32,11 @@ public class UserService
             throw new IllegalArgumentException("Nickname must not be empty");
 
         if(userRepository.existsByEmail(email))
-            throw new IllegalArgumentException("User with this email already exists");
+            throw new RuntimeException("User with this email already exists");
         if(password.length() < 8)
             throw new IllegalArgumentException("Your password must have at least 8 characters");
         if(userRepository.existsByNickname(nickname))
-            throw new IllegalArgumentException("Your nickname must be unique");
+            throw new RuntimeException("Your nickname must be unique");
 
         User user = new User();
         user.setEmail(email);
@@ -58,7 +58,7 @@ public class UserService
         User user = userProvider.getUserFromId(userId);
 
         if(newPassword.equals(user.getPassword()))
-            throw new IllegalArgumentException("New password must be different from the old one");
+            throw new RuntimeException("New password must be different from the old one");
 
         user.setPassword(newPassword);
     }

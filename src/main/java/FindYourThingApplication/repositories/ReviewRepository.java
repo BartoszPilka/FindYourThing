@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
     boolean existsByReviewerAndItem(Integer reviewerId, Integer itemId);
     @Query("SELECT AVG(r.grade) FROM Review r WHERE r.founder.id = :userId")
-    Double getAverageGradeByFounderId(@Param("userId") Integer userId);
+    Double findAverageGradeByFounderId(@Param("userId") Integer userId);
 }

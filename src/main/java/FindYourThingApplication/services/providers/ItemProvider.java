@@ -16,7 +16,7 @@ public class ItemProvider
     public Item getItemFromId(Integer itemId)
     {
         return itemRepository.findById(itemId).orElseThrow(
-                () -> new IllegalArgumentException("This item doesn't exist")
+                () -> new RuntimeException("This item doesn't exist")
         );
     }
 }

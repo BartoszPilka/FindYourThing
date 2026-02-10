@@ -16,14 +16,14 @@ public class UserProvider
     public User getUserFromId(Integer userId)
     {
         return userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("This user doesn't exist")
+                () -> new RuntimeException("This user doesn't exist")
         );
     }
 
     public User getUserFromEmail(String email)
     {
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("This user doesn't exist")
+                () -> new RuntimeException("This user doesn't exist")
         );
     }
 }

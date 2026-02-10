@@ -51,20 +51,20 @@ public class ReviewService
         Item item = itemProvider.getItemFromId(itemId);
 
         if (item.getFounder() == null || item.getOwner() == null) {
-            throw new IllegalArgumentException("Item must have both a founder and an owner assigned before reviewing");
+            throw new RuntimeException("Item must have both a founder and an owner assigned before reviewing");
         }
 
         if (!item.getFounder().getId().equals(founderId)) {
-            throw new IllegalArgumentException("The provided founder is not the actual finder of this item");
+            throw new RuntimeException("The provided founder is not the actual finder of this item");
         }
 
         if (!item.getOwner().getId().equals(reviewerId)) {
-            throw new IllegalArgumentException("Only the verified owner can review this transaction");
+            throw new RuntimeException("Only the verified owner can review this transaction");
         }
 
         User reviewer = userProvider.getUserFromId(reviewerId);
         if (reviewRepository.existsByReviewerAndItem(reviewer.getId(), item.getId())) {
-            throw new IllegalArgumentException("You have already reviewed this item");
+            throw new RuntimeException("You have already reviewed this item");
         }
         User founder = userProvider.getUserFromId(founderId);
 
@@ -84,7 +84,7 @@ public class ReviewService
             throw new IllegalArgumentException("ID of an user cannot be null");
 
         User user = userProvider.getUserFromId(userId);
-        Double average = reviewRepository.getAverageGradeByFounderId(userId);
+        Double average = reviewRepository.findAverageGradeByFounderId(userId);
         if(average == null)
             average = 0.0;
 
@@ -102,7 +102,7 @@ public class ReviewService
         Review review = reviewProvider.getReviewFromId(reviewId);
 
         if(!review.getReviewer().getId().equals(reviewerId))
-            throw new IllegalArgumentException("This user is not the author of the review");
+            throw new RuntimeException("This user is not the author of the review");
 
         reviewRepository.delete(review);
     }
@@ -120,7 +120,7 @@ public class ReviewService
         Review review = reviewProvider.getReviewFromId(reviewId);
 
         if(!review.getReviewer().getId().equals(reviewerId))
-            throw new IllegalArgumentException("You are not allowed to edit this review");
+            throw new RuntimeException("You are not allowed to edit this review");
 
         review.setGrade(grade);
         reviewRepository.save(review);

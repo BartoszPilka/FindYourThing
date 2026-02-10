@@ -16,7 +16,7 @@ public class ReviewProvider
     public Review getReviewFromId(Integer reviewId)
     {
         return reviewRepository.findById(reviewId).orElseThrow(
-                () -> new IllegalArgumentException("This review does not exist")
+                () -> new RuntimeException("This review does not exist")
         );
     }
 }

@@ -1,5 +1,6 @@
 package FindYourThingApplication.entities.dto.requests;
 
+import FindYourThingApplication.entities.enums.ListingStatus;
 import FindYourThingApplication.entities.enums.ListingType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
