@@ -63,7 +63,7 @@ public class ReviewService
         }
 
         User reviewer = userProvider.getUserFromId(reviewerId);
-        if (reviewRepository.existsByReviewerAndItem(reviewer.getId(), item.getId())) {
+        if (reviewRepository.existsByReviewerIdAndItemId(reviewer.getId(), item.getId())) {
             throw new RuntimeException("You have already reviewed this item");
         }
         User founder = userProvider.getUserFromId(founderId);

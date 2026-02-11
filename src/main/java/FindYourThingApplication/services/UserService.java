@@ -40,12 +40,8 @@ public class UserService
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-        user.setStatus(UserStatus.INACTIVE);
         user.setNickname(request.getNickname());
-
-        if(user.getStatus() == null) {
-            throw new RuntimeException("STATUS IS NULL BEFORE SAVE");
-        }
+        user.setStatus(UserStatus.INACTIVE);
 
         userRepository.save(user);
         return user.getId();
