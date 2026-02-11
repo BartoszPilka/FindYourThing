@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/images")
 public class ImageController
 {
-
+    //idk what should be here
 }

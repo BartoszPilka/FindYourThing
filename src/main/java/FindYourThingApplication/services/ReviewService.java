@@ -3,6 +3,7 @@ package FindYourThingApplication.services;
 import FindYourThingApplication.entities.Item;
 import FindYourThingApplication.entities.Review;
 import FindYourThingApplication.entities.User;
+import FindYourThingApplication.entities.dto.requests.CreateReviewRequest;
 import FindYourThingApplication.repositories.ItemRepository;
 import FindYourThingApplication.repositories.ReviewRepository;
 import FindYourThingApplication.services.providers.ItemProvider;
@@ -31,30 +32,33 @@ public class ReviewService
         this.reviewProvider = reviewProvider;
     }
 
-    public List<Review> getUserReviews(Integer userId){
+    public List<Review> getUserReviewsReceived(Integer userId){
         User user = userProvider.getUserFromId(userId);
         return user.getReviewsReceived();
     }
 
     @Transactional
-    public Integer createReview(Integer reviewerId, Integer itemId, Integer grade, Integer founderId)
+    public Integer createReview(Integer reviewerId, CreateReviewRequest request)
     {
-        if(itemId == null)
+        if(request == null)
+            throw new IllegalArgumentException("Request must not be null");
+
+        if(request.getItemId() == null)
             throw new IllegalArgumentException("ID of an item cannot be null");
 
-        if(grade == null ||grade < 1 || grade > 5)
+        if(request.getGrade() == null || request.getGrade() < 1 || request.getGrade() > 5)
             throw new IllegalArgumentException("Grade must be from 1 to 5");
 
-        if(reviewerId.equals(founderId))
+        if(reviewerId.equals(request.getFounderId()))
             throw new IllegalArgumentException("You cannot review yourself");
 
-        Item item = itemProvider.getItemFromId(itemId);
+        Item item = itemProvider.getItemFromId(request.getItemId());
 
         if (item.getFounder() == null || item.getOwner() == null) {
             throw new RuntimeException("Item must have both a founder and an owner assigned before reviewing");
         }
 
-        if (!item.getFounder().getId().equals(founderId)) {
+        if (!item.getFounder().getId().equals(request.getFounderId())) {
             throw new RuntimeException("The provided founder is not the actual finder of this item");
         }
 
@@ -66,12 +70,12 @@ public class ReviewService
         if (reviewRepository.existsByReviewerIdAndItemId(reviewer.getId(), item.getId())) {
             throw new RuntimeException("You have already reviewed this item");
         }
-        User founder = userProvider.getUserFromId(founderId);
+        User founder = userProvider.getUserFromId(request.getFounderId());
 
         Review review = new Review();
         review.setReviewer(reviewer);
         review.setFounder(founder);
-        review.setGrade(grade);
+        review.setGrade(request.getGrade());
         review.setItem(item);
 
         reviewRepository.save(review);

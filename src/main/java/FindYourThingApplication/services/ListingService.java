@@ -127,7 +127,7 @@ public class ListingService
     }
 
     @Transactional
-    public Integer editListing(Integer listingId, EditListingRequest request, Integer authorId) throws IOException {
+    public void editListing(Integer listingId, EditListingRequest request, Integer authorId) throws IOException {
         //validateRequest() cannot be used here - we're patching the existing listing so that we validate every field differently
         if(request == null)
             throw new IllegalArgumentException("Request must not be null");
@@ -202,8 +202,6 @@ public class ListingService
                 listing.getItem().getImages().add(image);
             }
         }
-
-        return listing.getId();
     }
 
     public List<Listing> getUserListings(Integer userId){

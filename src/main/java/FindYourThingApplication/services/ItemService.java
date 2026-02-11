@@ -29,6 +29,7 @@ public class ItemService
 
         return itemRepository.findByFounderId(user.getId());
     }
+
     public List<Item> getUserOwnedItems(Integer userId)
     {
         if(userId == null)
