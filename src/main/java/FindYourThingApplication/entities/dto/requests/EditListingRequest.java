@@ -1,11 +1,11 @@
 package FindYourThingApplication.entities.dto.requests;
 
-import FindYourThingApplication.entities.enums.ListingStatus;
 import FindYourThingApplication.entities.enums.ListingType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ListingRequest
+public class EditListingRequest
 {
     private ListingType listingType;
 
@@ -22,5 +22,6 @@ public class ListingRequest
 
     private String description;
 
-    private List<String> itemImagesUrl;
+    private List<MultipartFile> itemImages;
+    private List<Integer> imagesToDelete;
 }

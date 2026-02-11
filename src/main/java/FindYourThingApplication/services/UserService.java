@@ -1,6 +1,7 @@
 package FindYourThingApplication.services;
 
 import FindYourThingApplication.entities.User;
+import FindYourThingApplication.entities.dto.requests.UserRequest;
 import FindYourThingApplication.entities.enums.UserStatus;
 import FindYourThingApplication.repositories.UserRepository;
 import FindYourThingApplication.services.providers.UserProvider;
@@ -20,29 +21,31 @@ public class UserService
 
     @Transactional
     public Integer createUser(
-            String email,
-            String password,
-            String nickname
+            UserRequest request
     ){
-        if(email == null || email.isBlank())
+        if(request.getEmail() == null || request.getEmail().isBlank())
             throw new IllegalArgumentException("Email must not be empty");
-        if(password == null || password.isBlank())
+        if(request.getPassword() == null || request.getPassword().isBlank())
             throw new IllegalArgumentException("Password must not be empty");
-        if(nickname == null || nickname.isBlank())
+        if(request.getNickname() == null || request.getNickname().isBlank())
             throw new IllegalArgumentException("Nickname must not be empty");
 
-        if(userRepository.existsByEmail(email))
+        if(userRepository.existsByEmail(request.getEmail()))
             throw new RuntimeException("User with this email already exists");
-        if(password.length() < 8)
+        if(request.getPassword().length() < 8)
             throw new IllegalArgumentException("Your password must have at least 8 characters");
-        if(userRepository.existsByNickname(nickname))
+        if(userRepository.existsByNickname(request.getNickname()))
             throw new RuntimeException("Your nickname must be unique");
 
         User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
         user.setStatus(UserStatus.INACTIVE);
-        user.setNickname(nickname);
+        user.setNickname(request.getNickname());
+
+        if(user.getStatus() == null) {
+            throw new RuntimeException("STATUS IS NULL BEFORE SAVE");
+        }
 
         userRepository.save(user);
         return user.getId();

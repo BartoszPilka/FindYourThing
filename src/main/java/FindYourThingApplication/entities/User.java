@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,11 +36,11 @@ public class User
 
     //helpful relation mapping
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private List<Listing> listings;
+    private List<Listing> listings = new ArrayList<>();
 
     @OneToMany(mappedBy = "founder")
-    private List<Review> reviewsReceived;
+    private List<Review> reviewsReceived = new ArrayList<>();
 
     @OneToMany(mappedBy = "owner")
-    private List<Item> itemsOwned;
+    private List<Item> itemsOwned = new ArrayList<>();
 }

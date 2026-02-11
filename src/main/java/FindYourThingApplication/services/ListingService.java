@@ -4,7 +4,8 @@ import FindYourThingApplication.entities.Image;
 import FindYourThingApplication.entities.Item;
 import FindYourThingApplication.entities.Listing;
 import FindYourThingApplication.entities.User;
-import FindYourThingApplication.entities.dto.requests.ListingRequest;
+import FindYourThingApplication.entities.dto.requests.CreateListingRequest;
+import FindYourThingApplication.entities.dto.requests.EditListingRequest;
 import FindYourThingApplication.entities.enums.ListingStatus;
 import FindYourThingApplication.entities.enums.ListingType;
 import FindYourThingApplication.repositories.ImageRepository;
@@ -15,10 +16,11 @@ import FindYourThingApplication.services.providers.UserProvider;
 import jakarta.transaction.Transactional;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,21 +31,24 @@ public class ListingService
     private final ItemRepository itemRepository;
     private final ImageRepository imageRepository;
 
+    private final ImageService imageService;
+
     private final UserProvider userProvider;
     private final ListingProvider listingProvider;
 
     private final GeometryFactory GF = new GeometryFactory(new PrecisionModel(), 4326);
 
 
-    public ListingService(ListingRepository listingRepository, ItemRepository itemRepository, ImageRepository imageRepository, UserProvider userProvider, ListingProvider listingProvider) {
+    public ListingService(ListingRepository listingRepository, ItemRepository itemRepository, ImageRepository imageRepository, ImageService imageService, UserProvider userProvider, ListingProvider listingProvider) {
         this.listingRepository = listingRepository;
         this.itemRepository = itemRepository;
         this.imageRepository = imageRepository;
+        this.imageService = imageService;
         this.userProvider = userProvider;
         this.listingProvider = listingProvider;
     }
 
-    private void validateRequest(ListingRequest request, Integer authorId)
+    private void validateRequest(CreateListingRequest request, Integer authorId)
     {
         if(request == null)
             throw new IllegalArgumentException("Request must not be null");
@@ -58,8 +63,7 @@ public class ListingService
     }
 
     @Transactional
-    public Integer createListing(ListingRequest request, Integer authorId)
-    {
+    public Integer createListing(CreateListingRequest request, Integer authorId) throws IOException {
         validateRequest(request, authorId);
 
         Listing listing = new Listing();
@@ -78,10 +82,12 @@ public class ListingService
             item.setOwner(null);
         }
 
-        if(request.getItemImagesUrl() != null && !request.getItemImagesUrl().isEmpty())
+        if(request.getItemImages() != null && !request.getItemImages().isEmpty())
         {
-            for(String imageUrl: request.getItemImagesUrl())
+            for(MultipartFile file: request.getItemImages())
             {
+                String imageUrl = imageService.saveFile(file);
+
                 Image image = new Image();
                 image.setItem(item);
                 image.setImageUrl(imageUrl);
@@ -121,8 +127,7 @@ public class ListingService
     }
 
     @Transactional
-    public Integer editListing(Integer listingId, ListingRequest request, Integer authorId)
-    {
+    public Integer editListing(Integer listingId, EditListingRequest request, Integer authorId) throws IOException {
         //validateRequest() cannot be used here - we're patching the existing listing so that we validate every field differently
         if(request == null)
             throw new IllegalArgumentException("Request must not be null");
@@ -169,12 +174,27 @@ public class ListingService
             listing.setDescription(request.getDescription());
         }
 
-        if(request.getItemImagesUrl() != null)
+        if(request.getImagesToDelete() != null && !request.getImagesToDelete().isEmpty())
         {
+            List<Image> imagesToRemove = listing.getItem().getImages()
+                    .stream()
+                    .filter(img -> request.getImagesToDelete().contains(img.getId()))
+                    .toList();
+
+            for(Image imgToRemove : imagesToRemove)
+            {
+                imageService.deleteFile(imgToRemove.getImageUrl());
+                listing.getItem().getImages().remove(imgToRemove);
+            }
+        }
+        if(request.getItemImages() != null && !request.getItemImages().isEmpty()) {
+
             listing.getItem().getImages().clear();
 
-            for(String imageUrl : request.getItemImagesUrl())
-            {
+            for(MultipartFile file : request.getItemImages()) {
+
+                String imageUrl = imageService.saveFile(file);
+
                 Image image = new Image();
                 image.setItem(listing.getItem());
                 image.setImageUrl(imageUrl);

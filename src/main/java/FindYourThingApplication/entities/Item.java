@@ -33,7 +33,7 @@ public class Item
     private Listing listing;
 
     //useful connection
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
