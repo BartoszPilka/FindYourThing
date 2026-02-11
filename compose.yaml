@@ -20,6 +20,9 @@ services:
       SPRING_DATASOURCE_URL: ${DBURL}
       SPRING_DATASOURCE_USERNAME: ${DBUSERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DBPASSWORD}
+      UPLOADS_DIRECTORY: ${UPLOADS_DIRECTORY}
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       database:
         condition: service_healthy

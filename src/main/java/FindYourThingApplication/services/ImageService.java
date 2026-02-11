@@ -5,6 +5,7 @@ import FindYourThingApplication.entities.Item;
 import FindYourThingApplication.repositories.ImageRepository;
 import FindYourThingApplication.services.providers.ItemProvider;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +27,8 @@ public class ImageService
         this.itemProvider = itemProvider;
     }
 
-    private final String uploadDir = "${UPLOADS_DIRECTORY}/";
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Transactional
     public String saveFile(MultipartFile file) throws IOException {
@@ -38,6 +40,7 @@ public class ImageService
         Files.write(path, file.getBytes());
 
         // URL który zapiszesz w bazie
+
         return "/files/" + fileName;
     }
 

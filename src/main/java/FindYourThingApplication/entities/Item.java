@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,11 +34,9 @@ public class Item
     private Listing listing;
 
     //useful connection
-//    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true) - nie mozna requestowac
-    @OneToMany(mappedBy = "item", orphanRemoval = true)
-    private List<Image> images;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    @OneToMany(mappedBy = "item")
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<Review> reviews;
 }

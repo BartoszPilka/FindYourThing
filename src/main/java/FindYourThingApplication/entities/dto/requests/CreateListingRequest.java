@@ -18,5 +18,5 @@ public class CreateListingRequest
 
     private String description;
 
-    private List<MultipartFile> itemImages;
+    private List<String> itemImagesUrl;
 }

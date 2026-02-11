@@ -30,8 +30,7 @@ public class Listing
     @Column(name = "type")
     private ListingType type;
 
-//    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) - nie mozna requeastowac
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id", referencedColumnName = "id", nullable = false, unique = true)
     private Item item;
 

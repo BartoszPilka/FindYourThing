@@ -22,7 +22,7 @@ public class ItemController
         this.itemService = itemService;
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/found")
     public ResponseEntity<?> getUserFoundItems(@RequestParam Integer userId)
     {
         List<Item> items;
@@ -37,7 +37,7 @@ public class ItemController
         return ResponseEntity.ok(items);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/owned")
     public ResponseEntity<?> getUserOwnedItems(@RequestParam Integer userId)
     {
         List<Item> items;

@@ -5,6 +5,7 @@ import FindYourThingApplication.entities.dto.requests.CreateListingRequest;
 import FindYourThingApplication.entities.dto.requests.EditListingRequest;
 import FindYourThingApplication.services.ListingService;
 import lombok.Getter;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,10 +30,7 @@ public class ListingController
         {
             id = listingService.createListing(request, authorId);
         }
-        catch(IOException e)
-        {
-            return ResponseEntity.badRequest().body("Error occurred while uploading an image");
-        }
+
         catch (RuntimeException e)
         {
             return ResponseEntity.badRequest().body(e.getMessage());

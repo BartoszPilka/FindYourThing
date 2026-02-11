@@ -63,7 +63,8 @@ public class ListingService
     }
 
     @Transactional
-    public Integer createListing(CreateListingRequest request, Integer authorId) throws IOException {
+    public Integer createListing(CreateListingRequest request, Integer authorId)
+    {
         validateRequest(request, authorId);
 
         Listing listing = new Listing();
@@ -82,12 +83,10 @@ public class ListingService
             item.setOwner(null);
         }
 
-        if(request.getItemImages() != null && !request.getItemImages().isEmpty())
+        if(request.getItemImagesUrl() != null && !request.getItemImagesUrl().isEmpty())
         {
-            for(MultipartFile file: request.getItemImages())
+            for(String imageUrl: request.getItemImagesUrl())
             {
-                String imageUrl = imageService.saveFile(file);
-
                 Image image = new Image();
                 image.setItem(item);
                 image.setImageUrl(imageUrl);
