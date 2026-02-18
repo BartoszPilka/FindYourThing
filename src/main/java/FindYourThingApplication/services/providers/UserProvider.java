@@ -1,6 +1,7 @@
 package FindYourThingApplication.services.providers;
 
 import FindYourThingApplication.entities.User;
+import FindYourThingApplication.exceptions.user.UserNotFoundException;
 import FindYourThingApplication.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +17,14 @@ public class UserProvider
     public User getUserFromId(Integer userId)
     {
         return userRepository.findById(userId).orElseThrow(
-                () -> new RuntimeException("This user doesn't exist")
+                UserNotFoundException::new
         );
     }
 
     public User getUserFromEmail(String email)
     {
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new RuntimeException("This user doesn't exist")
+                UserNotFoundException::new
         );
     }
 }

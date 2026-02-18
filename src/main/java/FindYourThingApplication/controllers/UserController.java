@@ -1,46 +1,42 @@
 package FindYourThingApplication.controllers;
 
-import FindYourThingApplication.entities.dto.requests.UserRequest;
+import FindYourThingApplication.entities.dto.requests.ChangePasswordRequest;
+import FindYourThingApplication.entities.dto.requests.CreateUserRequest;
+import FindYourThingApplication.entities.dto.responses.UserResponse;
 import FindYourThingApplication.services.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@Validated
+@RequiredArgsConstructor
 public class UserController
 {
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
     @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody UserRequest request)
+    public ResponseEntity<UserResponse> addUser(@Valid @RequestBody CreateUserRequest request)
     {
-        Integer userId;
-        try
-        {
-            userId = userService.createUser(request);
-        }
-        catch (RuntimeException e)
-        {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-        return ResponseEntity.ok(userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
     @PostMapping("/changePassword")              //authorization token todo
-    public ResponseEntity<String> changePassword(@RequestParam Integer userId, @RequestParam String password)
+    public ResponseEntity<Void> changePassword(@RequestParam Integer userId, @Valid @RequestBody ChangePasswordRequest request)
     {
-        try
-        {
-            userService.changePassword(userId, password);
-        }
-        catch (RuntimeException e)
-        {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-        return ResponseEntity.ok("Password changed successfully");
+        userService.changePassword(userId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<UserResponse>> getAllUsers()
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
     }
 }

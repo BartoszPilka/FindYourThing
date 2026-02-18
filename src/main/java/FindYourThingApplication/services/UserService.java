@@ -1,64 +1,74 @@
 package FindYourThingApplication.services;
 
 import FindYourThingApplication.entities.User;
-import FindYourThingApplication.entities.dto.requests.UserRequest;
+import FindYourThingApplication.entities.dto.requests.ChangePasswordRequest;
+import FindYourThingApplication.entities.dto.requests.CreateUserRequest;
+import FindYourThingApplication.entities.dto.responses.UserResponse;
 import FindYourThingApplication.entities.enums.UserStatus;
+import FindYourThingApplication.exceptions.user.DuplicatedEmailException;
+import FindYourThingApplication.exceptions.user.DuplicatedNicknameException;
+import FindYourThingApplication.exceptions.user.DuplicatedPasswordException;
+import FindYourThingApplication.exceptions.user.PasswordMismatchException;
+import FindYourThingApplication.mappers.UserMapper;
 import FindYourThingApplication.repositories.UserRepository;
 import FindYourThingApplication.services.providers.UserProvider;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService
 {
     private final UserRepository userRepository;
+
     private final UserProvider userProvider;
 
-    public UserService(UserRepository userRepository, UserProvider userProvider) {
+    private final UserMapper userMapper;
+
+    public UserService(UserRepository userRepository, UserProvider userProvider, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userProvider = userProvider;
+        this.userMapper = userMapper;
     }
 
     @Transactional
-    public Integer createUser(
-            UserRequest request
-    ){
-        if(request.getEmail() == null || request.getEmail().isBlank())
-            throw new IllegalArgumentException("Email must not be empty");
-        if(request.getPassword() == null || request.getPassword().isBlank())
-            throw new IllegalArgumentException("Password must not be empty");
-        if(request.getNickname() == null || request.getNickname().isBlank())
-            throw new IllegalArgumentException("Nickname must not be empty");
-
-        if(userRepository.existsByEmail(request.getEmail()))
-            throw new RuntimeException("User with this email already exists");
-        if(request.getPassword().length() < 8)
-            throw new IllegalArgumentException("Your password must have at least 8 characters");
-        if(userRepository.existsByNickname(request.getNickname()))
-            throw new RuntimeException("Your nickname must be unique");
-
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setNickname(request.getNickname());
-        user.setStatus(UserStatus.INACTIVE);
-
-        userRepository.save(user);
-        return user.getId();
-    }
-
-
-    @Transactional
-    public void changePassword(Integer userId, String newPassword)
+    public UserResponse createUser(CreateUserRequest request)
     {
-        if(newPassword == null || newPassword.isBlank() || newPassword.length() < 8)
-            throw new IllegalArgumentException("Your new password must have at least 8 characters");
+       if(userRepository.existsByEmail(request.getEmail()))
+           throw new DuplicatedEmailException();
+       if(userRepository.existsByNickname(request.getNickname()))
+           throw new DuplicatedNicknameException();
 
+       User user = userMapper.mapToEntity(request);
+       user.setStatus(UserStatus.INACTIVE);
+
+       User saved = userRepository.save(user);
+       return userMapper.mapToDTO(saved);
+    }
+
+    @Transactional
+    public void changePassword(Integer userId, ChangePasswordRequest request)
+    {
         User user = userProvider.getUserFromId(userId);
+        if(!user.getPassword().equals(request.getCurrentPassword()))
+            throw new PasswordMismatchException();
 
-        if(newPassword.equals(user.getPassword()))
-            throw new RuntimeException("New password must be different from the old one");
+        if(user.getPassword().equals(request.getNewPassword()))
+            throw new DuplicatedPasswordException();
 
-        user.setPassword(newPassword);
+        if(!request.getNewPassword().equals(request.getConfirmNewPassword()))
+            throw new PasswordMismatchException();
+
+        //hashing the new password
+
+        user.setPassword(request.getNewPassword());
+    }
+
+    public List<UserResponse> getAllUsers()
+    {
+        return userRepository.findAll().stream()
+                .map(user -> userMapper.mapToDTO(user))
+                .toList();
     }
 }
