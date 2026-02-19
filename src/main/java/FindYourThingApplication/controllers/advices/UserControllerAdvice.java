@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 public class UserControllerAdvice
 {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException e) {
 
-        String message = ex.getBindingResult()
+        String message = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
@@ -33,58 +33,46 @@ public class UserControllerAdvice
                 ));
     }
 
-
-    @ExceptionHandler(DuplicatedEmailException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicatedEmail(DuplicatedEmailException ex) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse(
-                        HttpStatus.CONFLICT.value(),
-                        ex.getMessage(),
-                        LocalDateTime.now()
-                ));
-    }
-
     @ExceptionHandler(PasswordMismatchException.class)
-    public ResponseEntity<ErrorResponse> handlePasswordMismatch(PasswordMismatchException ex) {
+    public ResponseEntity<ErrorResponse> handlePasswordMismatch(PasswordMismatchException e) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(
                         HttpStatus.CONFLICT.value(),
-                        ex.getMessage(),
+                        e.getMessage(),
                         LocalDateTime.now()
                 ));
     }
 
-    @ExceptionHandler(DuplicatedNicknameException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicatedNickname(DuplicatedNicknameException ex) {
+    @ExceptionHandler(NotUniqueFieldException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicatedNickname(NotUniqueFieldException e) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(
                         HttpStatus.CONFLICT.value(),
-                        ex.getMessage(),
+                        e.getMessage(),
                         LocalDateTime.now()
                 ));
     }
 
     @ExceptionHandler(DuplicatedPasswordException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicatedPassword(DuplicatedPasswordException ex) {
+    public ResponseEntity<ErrorResponse> handleDuplicatedPassword(DuplicatedPasswordException e) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(
                         HttpStatus.CONFLICT.value(),
-                        ex.getMessage(),
+                        e.getMessage(),
                         LocalDateTime.now()
                 ));
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(
                         HttpStatus.NOT_FOUND.value(),
-                        ex.getMessage(),
+                        e.getMessage(),
                         LocalDateTime.now()
                 ));
     }

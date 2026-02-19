@@ -14,8 +14,8 @@ import lombok.Setter;
 public class ReviewResponse
 {
     private Integer id;
-    private User founder;
-    private User reviewer;
+    private Integer founderId;
+    private Integer reviewerId;
     private Integer grade;
-    private Item item;
+    private Integer itemId;
 }

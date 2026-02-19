@@ -4,82 +4,54 @@ import FindYourThingApplication.entities.Item;
 import FindYourThingApplication.entities.Review;
 import FindYourThingApplication.entities.User;
 import FindYourThingApplication.entities.dto.requests.CreateReviewRequest;
+import FindYourThingApplication.entities.dto.responses.ReviewResponse;
+import FindYourThingApplication.mappers.ReviewMapper;
 import FindYourThingApplication.repositories.ItemRepository;
 import FindYourThingApplication.repositories.ReviewRepository;
 import FindYourThingApplication.services.providers.ItemProvider;
 import FindYourThingApplication.services.providers.ReviewProvider;
 import FindYourThingApplication.services.providers.UserProvider;
+import FindYourThingApplication.services.validation.ReviewValidation;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService
 {
     private final ReviewRepository reviewRepository;
     private final ItemRepository itemRepository;
+
+    private final ReviewValidation reviewValidation;
+
+    private final ReviewMapper reviewMapper;
 
     private final UserProvider userProvider;
     private final ItemProvider itemProvider;
     private  final ReviewProvider reviewProvider;
 
 
-    public ReviewService(ReviewRepository reviewRepository, ItemRepository itemRepository, UserProvider userProvider, ItemProvider itemProvider, ReviewProvider reviewProvider) {
-        this.reviewRepository = reviewRepository;
-        this.itemRepository = itemRepository;
-        this.userProvider = userProvider;
-        this.itemProvider = itemProvider;
-        this.reviewProvider = reviewProvider;
-    }
-
-    public List<Review> getUserReviewsReceived(Integer userId){
+    public List<ReviewResponse> getUserReviewsReceived(Integer userId){
         User user = userProvider.getUserFromId(userId);
-        return user.getReviewsReceived();
+        return user.getReviewsReceived().stream()
+                .map(reviewMapper::mapToDTO)
+                .toList();
     }
 
     @Transactional
-    public Integer createReview(Integer reviewerId, CreateReviewRequest request)
+    public ReviewResponse createReview(Integer reviewerId, CreateReviewRequest request)
     {
-        if(request == null)
-            throw new IllegalArgumentException("Request must not be null");
-
-        if(request.getItemId() == null)
-            throw new IllegalArgumentException("ID of an item cannot be null");
-
-        if(request.getGrade() == null || request.getGrade() < 1 || request.getGrade() > 5)
-            throw new IllegalArgumentException("Grade must be from 1 to 5");
-
-        if(reviewerId.equals(request.getFounderId()))
-            throw new IllegalArgumentException("You cannot review yourself");
-
+        User reviewer = userProvider.getUserFromId(reviewerId);
+        User founder = userProvider.getUserFromId(request.getFounderId());
         Item item = itemProvider.getItemFromId(request.getItemId());
 
-        if (item.getFounder() == null || item.getOwner() == null) {
-            throw new RuntimeException("Item must have both a founder and an owner assigned before reviewing");
-        }
+        reviewValidation.validateCreateReview(item, founder, reviewer);
 
-        if (!item.getFounder().getId().equals(request.getFounderId())) {
-            throw new RuntimeException("The provided founder is not the actual finder of this item");
-        }
-
-        if (!item.getOwner().getId().equals(reviewerId)) {
-            throw new RuntimeException("Only the verified owner can review this transaction");
-        }
-
-        User reviewer = userProvider.getUserFromId(reviewerId);
-        if (reviewRepository.existsByReviewerIdAndItemId(reviewer.getId(), item.getId())) {
-            throw new RuntimeException("You have already reviewed this item");
-        }
-        User founder = userProvider.getUserFromId(request.getFounderId());
-
-        Review review = new Review();
-        review.setReviewer(reviewer);
-        review.setFounder(founder);
-        review.setGrade(request.getGrade());
-        review.setItem(item);
-
-        reviewRepository.save(review);
-        return review.getId();
+        Review review = reviewMapper.mapToEntity(request, reviewer, founder, item);
+        Review saved = reviewRepository.save(review);
+        return reviewMapper.mapToDTO(saved);
     }
 
     public Double getUserAverageGrade(Integer userId)
