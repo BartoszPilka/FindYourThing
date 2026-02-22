@@ -3,6 +3,7 @@ package FindYourThingApplication.controllers.advices;
 import FindYourThingApplication.ErrorResponse;
 import FindYourThingApplication.controllers.UserController;
 import FindYourThingApplication.exceptions.user.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -73,6 +74,23 @@ public class UserControllerAdvice
                 .body(new ErrorResponse(
                         HttpStatus.NOT_FOUND.value(),
                         e.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleIntegrityViolation(DataIntegrityViolationException e)
+    {
+        String message = "";
+        if(e.getMessage().contains("users_email_key"))
+            message = "Email must be unique";
+        else if(e.getMessage().contains("users_nickname_key"))
+            message = "Nickname must be unique";
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(
+                        HttpStatus.CONFLICT.value(),
+                        message,
                         LocalDateTime.now()
                 ));
     }

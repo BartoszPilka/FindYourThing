@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateUserRequest
+public class RegisterRequest
 {
     @NotBlank(message = "Email cannot be blank")
     @Size(min = 5, max = 100, message = "Email must have 5-100 characters")

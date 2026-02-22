@@ -21,6 +21,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DBUSERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DBPASSWORD}
       UPLOADS_DIRECTORY: ${UPLOADS_DIRECTORY}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
     volumes:
       - ./uploads:/app/uploads
     depends_on:

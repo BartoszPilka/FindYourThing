@@ -16,7 +16,7 @@ public interface ReviewMapper
     @Mapping(source = "request.grade", target = "grade")
     Review mapToEntity(CreateReviewRequest request, User reviewer, User founder, Item item);
 
-    @Mapping(source = "request.id", target = "id")
+    @Mapping(source = "request.reviewId", target = "id")
     @Mapping(source = "request.grade", target = "grade")
     Review updateEntity(EditReviewRequest request, User reviewer, User founder, Item item);
 

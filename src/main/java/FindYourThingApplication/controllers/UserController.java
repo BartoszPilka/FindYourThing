@@ -1,7 +1,6 @@
 package FindYourThingApplication.controllers;
 
 import FindYourThingApplication.entities.dto.requests.ChangePasswordRequest;
-import FindYourThingApplication.entities.dto.requests.CreateUserRequest;
 import FindYourThingApplication.entities.dto.responses.UserResponse;
 import FindYourThingApplication.services.UserService;
 import jakarta.validation.Valid;
@@ -21,13 +20,7 @@ public class UserController
 {
     private final UserService userService;
 
-    @PostMapping("/add")
-    public ResponseEntity<UserResponse> addUser(@Valid @RequestBody CreateUserRequest request)
-    {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
-    }
-
-    @PostMapping("/changePassword")              //authorization token todo
+    @PostMapping("/changePassword")
     public ResponseEntity<Void> changePassword(@RequestParam Integer userId, @Valid @RequestBody ChangePasswordRequest request)
     {
         userService.changePassword(userId, request);

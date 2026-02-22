@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
                                      email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     nickname VARCHAR(50) NOT NULL UNIQUE,
-    status VARCHAR DEFAULT 'INACTIVE' NOT NULL
+    status VARCHAR DEFAULT 'INACTIVE' NOT NULL,
+    role VARCHAR DEFAULT 'USER' NOT NULL
     );
 
 -- Tabela: Items

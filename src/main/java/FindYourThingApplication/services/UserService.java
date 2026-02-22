@@ -2,10 +2,9 @@ package FindYourThingApplication.services;
 
 import FindYourThingApplication.entities.User;
 import FindYourThingApplication.entities.dto.requests.ChangePasswordRequest;
-import FindYourThingApplication.entities.dto.requests.CreateUserRequest;
+import FindYourThingApplication.entities.dto.requests.RegisterRequest;
 import FindYourThingApplication.entities.dto.responses.UserResponse;
 import FindYourThingApplication.entities.enums.UserStatus;
-import FindYourThingApplication.exceptions.user.NotUniqueFieldException;
 import FindYourThingApplication.exceptions.user.DuplicatedPasswordException;
 import FindYourThingApplication.exceptions.user.PasswordMismatchException;
 import FindYourThingApplication.mappers.UserMapper;
@@ -32,13 +31,8 @@ public class UserService
     }
 
     @Transactional
-    public UserResponse createUser(CreateUserRequest request)
+    public UserResponse createUser(RegisterRequest request)
     {
-       if(userRepository.existsByEmail(request.getEmail()))
-           throw new NotUniqueFieldException(request.getEmail());
-       if(userRepository.existsByNickname(request.getNickname()))
-           throw new NotUniqueFieldException(request.getNickname());
-
        User user = userMapper.mapToEntity(request);
        user.setStatus(UserStatus.INACTIVE);
 
