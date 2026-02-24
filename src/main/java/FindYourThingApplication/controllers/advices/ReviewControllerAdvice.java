@@ -1,12 +1,10 @@
 package FindYourThingApplication.controllers.advices;
 
 import FindYourThingApplication.ErrorResponse;
-import FindYourThingApplication.exceptions.review.DuplicatedReviewException;
-import FindYourThingApplication.exceptions.review.FounderMismatchException;
-import FindYourThingApplication.exceptions.review.OwnerMismatchException;
-import FindYourThingApplication.exceptions.review.SelfReviewException;
+import FindYourThingApplication.exceptions.review.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -59,6 +57,30 @@ public class ReviewControllerAdvice
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(
                         HttpStatus.CONFLICT.value(),
+                        e.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReviewNotFound(ReviewNotFoundException e)
+    {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        HttpStatus.NOT_FOUND.value(),
+                        e.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e)
+    {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        HttpStatus.FORBIDDEN.value(),
                         e.getMessage(),
                         LocalDateTime.now()
                 ));

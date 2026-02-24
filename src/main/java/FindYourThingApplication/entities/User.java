@@ -18,6 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class User implements UserDetails
@@ -41,6 +42,13 @@ public class User implements UserDetails
     @Column(name = "role", nullable = false)
     private Role role;
 
+    //average grades
+    @Column(name = "review_count", nullable = false)
+    private Integer reviewCount;
+
+    @Column(name = "total_grade_sum", nullable = false)
+    private Long totalGradeSum;
+
     //helpful relation mapping
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Listing> listings = new ArrayList<>();
@@ -51,11 +59,23 @@ public class User implements UserDetails
     @OneToMany(mappedBy = "owner")
     private List<Item> itemsOwned = new ArrayList<>();
 
+    //getting average grade by reviews
+    public Double getAvgGrade()
+    {
+        if (reviewCount == null || reviewCount == 0)
+            return 0.0;
+
+        double avg = (double) totalGradeSum / reviewCount;
+
+        return Math.round(avg * 100.0) / 100.0;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    //not username (nickname) but EMAIL is the primary identificator
     @Override
     public String getUsername() {
         return email;

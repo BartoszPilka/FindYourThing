@@ -1,8 +1,9 @@
 package FindYourThingApplication.controllers;
 
-import FindYourThingApplication.entities.Review;
+import FindYourThingApplication.entities.User;
 import FindYourThingApplication.entities.dto.requests.CreateReviewRequest;
-import FindYourThingApplication.entities.dto.requests.EditListingRequest;
+import FindYourThingApplication.entities.dto.requests.EditReviewRequest;
+import FindYourThingApplication.entities.dto.responses.AvgGradeResponse;
 import FindYourThingApplication.entities.dto.responses.ReviewResponse;
 import FindYourThingApplication.services.ReviewService;
 import jakarta.validation.Valid;
@@ -11,6 +12,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,26 +38,37 @@ public class ReviewController
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ReviewResponse> addReview(@RequestParam Integer reviewerId, @Valid @RequestBody CreateReviewRequest request)
+    public ResponseEntity<ReviewResponse> addReview(
+            @AuthenticationPrincipal User reviewer,
+            @Valid @RequestBody CreateReviewRequest request)
     {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.createReview(reviewerId, request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.createReview(reviewer.getId(), request));
     }
 
-//    @GetMapping("/users/average")
-//    public ResponseEntity<?> getUserAverageGrade(@RequestParam Integer userId)
-//    {
-//
-//    }
-//
-//    @DeleteMapping("/")
-//    public ResponseEntity<?> deleteReview(@RequestParam Integer reviewId, @RequestParam Integer reviewerId)
-//    {
-//
-//    }
-//
-//    @PutMapping("/users")
-//    public ResponseEntity<?> editReview(@RequestParam Integer reviewId, @RequestParam Integer reviewerId, @RequestParam Integer grade)
-//    {
-//
-//    }
+    @GetMapping("/{userId}/average")
+    public ResponseEntity<AvgGradeResponse> getUserAverageGrade(
+            @Positive(message = "User ID must be positive") @PathVariable Integer userId
+    )
+    {
+        return ResponseEntity.ok().body(reviewService.getUserAverageGrade(userId));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteReview(
+            @AuthenticationPrincipal User reviewer,
+            @Positive(message = "Review ID must be positive") @RequestParam Integer reviewId
+    )
+    {
+        reviewService.deleteReview(reviewId, reviewer.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<ReviewResponse> editReview(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody EditReviewRequest request
+    )
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.editReview(user.getId(), request));
+    }
 }

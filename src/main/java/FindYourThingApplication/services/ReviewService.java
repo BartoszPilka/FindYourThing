@@ -4,16 +4,23 @@ import FindYourThingApplication.entities.Item;
 import FindYourThingApplication.entities.Review;
 import FindYourThingApplication.entities.User;
 import FindYourThingApplication.entities.dto.requests.CreateReviewRequest;
+import FindYourThingApplication.entities.dto.requests.EditReviewRequest;
+import FindYourThingApplication.entities.dto.responses.AvgGradeResponse;
 import FindYourThingApplication.entities.dto.responses.ReviewResponse;
+import FindYourThingApplication.exceptions.user.UserNotFoundException;
 import FindYourThingApplication.mappers.ReviewMapper;
 import FindYourThingApplication.repositories.ItemRepository;
 import FindYourThingApplication.repositories.ReviewRepository;
+import FindYourThingApplication.repositories.UserRepository;
 import FindYourThingApplication.services.providers.ItemProvider;
 import FindYourThingApplication.services.providers.ReviewProvider;
 import FindYourThingApplication.services.providers.UserProvider;
 import FindYourThingApplication.services.validation.ReviewValidation;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -22,7 +29,7 @@ import java.util.List;
 public class ReviewService
 {
     private final ReviewRepository reviewRepository;
-    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
     private final ReviewValidation reviewValidation;
 
@@ -49,56 +56,50 @@ public class ReviewService
 
         reviewValidation.validateCreateReview(item, founder, reviewer);
 
+        founder.setReviewCount(founder.getReviewCount() +1);
+        founder.setTotalGradeSum(founder.getTotalGradeSum() + request.getGrade());
+
         Review review = reviewMapper.mapToEntity(request, reviewer, founder, item);
         Review saved = reviewRepository.save(review);
         return reviewMapper.mapToDTO(saved);
     }
 
-    public Double getUserAverageGrade(Integer userId)
+    public AvgGradeResponse getUserAverageGrade(Integer userId)
     {
-        if(userId == null)
-            throw new IllegalArgumentException("ID of an user cannot be null");
-
         User user = userProvider.getUserFromId(userId);
-        Double average = reviewRepository.findAverageGradeByFounderId(userId);
-        if(average == null)
-            average = 0.0;
+        Double average = user.getAvgGrade();
 
-        return Math.round(average * 100.0) / 100.0;
+        return new AvgGradeResponse(
+                user.getId(),
+                average
+        );
     }
 
     @Transactional
     public void deleteReview(Integer reviewId, Integer reviewerId)
     {
-        if(reviewId == null)
-            throw new IllegalArgumentException("ID of a review must not be null");
-        if(reviewerId == null)
-            throw new IllegalArgumentException("ID of an user must not be null");
-
-        Review review = reviewProvider.getReviewFromId(reviewId);
-
-        if(!review.getReviewer().getId().equals(reviewerId))
-            throw new RuntimeException("This user is not the author of the review");
-
+        Review review = reviewProvider.getReviewFromIdAndReviewerId(reviewId, reviewerId);
         reviewRepository.delete(review);
     }
 
     @Transactional
-    public void editReview(Integer reviewId, Integer reviewerId, Integer grade)
+    public ReviewResponse editReview(Integer reviewerId, EditReviewRequest request)
     {
-        if(reviewId == null)
-            throw new IllegalArgumentException("ID of a review must not be null");
-        if(reviewerId == null)
-            throw new IllegalArgumentException("ID of a reviewer must not be null");
-        if(grade == null || grade > 5 || grade < 1)
-            throw new IllegalArgumentException("Grade must be from 1 to 5");
-
-        Review review = reviewProvider.getReviewFromId(reviewId);
+        Review review = reviewProvider.getReviewWithDetails(request.getReviewId());
 
         if(!review.getReviewer().getId().equals(reviewerId))
-            throw new RuntimeException("You are not allowed to edit this review");
+            throw new AccessDeniedException("You cannot edit this review");
 
-        review.setGrade(grade);
-        reviewRepository.save(review);
+        Integer oldGrade = review.getGrade();
+        Integer newGrade = request.getGrade();
+
+        if(!oldGrade.equals(newGrade))
+        {
+            User founder = review.getFounder();
+            founder.setTotalGradeSum(founder.getTotalGradeSum() - oldGrade + newGrade);
+
+            reviewMapper.updateEntity(request, review);
+        }
+        return reviewMapper.mapToDTO(review);
     }
 }

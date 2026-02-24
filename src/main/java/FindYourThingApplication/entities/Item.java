@@ -1,5 +1,6 @@
 package FindYourThingApplication.entities;
 
+import FindYourThingApplication.entities.enums.ItemCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,10 @@ public class Item
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Integer id;
+
+    @Column(name = "category", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ItemCategory category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "founder_id", nullable = true)

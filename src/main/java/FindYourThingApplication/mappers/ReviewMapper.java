@@ -8,6 +8,7 @@ import FindYourThingApplication.entities.dto.requests.EditReviewRequest;
 import FindYourThingApplication.entities.dto.responses.ReviewResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ReviewMapper
@@ -16,12 +17,12 @@ public interface ReviewMapper
     @Mapping(source = "request.grade", target = "grade")
     Review mapToEntity(CreateReviewRequest request, User reviewer, User founder, Item item);
 
-    @Mapping(source = "request.reviewId", target = "id")
-    @Mapping(source = "request.grade", target = "grade")
-    Review updateEntity(EditReviewRequest request, User reviewer, User founder, Item item);
-
     @Mapping(source = "item.id", target = "itemId")
     @Mapping(source = "founder.id", target = "founderId")
     @Mapping(source = "reviewer.id", target = "reviewerId")
     ReviewResponse mapToDTO(Review review);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(source = "request.grade", target = "grade")
+    void updateEntity(EditReviewRequest request, @MappingTarget Review review);
 }

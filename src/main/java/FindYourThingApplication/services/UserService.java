@@ -11,11 +11,14 @@ import FindYourThingApplication.mappers.UserMapper;
 import FindYourThingApplication.repositories.UserRepository;
 import FindYourThingApplication.services.providers.UserProvider;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService
 {
     private final UserRepository userRepository;
@@ -24,11 +27,8 @@ public class UserService
 
     private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, UserProvider userProvider, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userProvider = userProvider;
-        this.userMapper = userMapper;
-    }
+    private final PasswordEncoder passwordEncoder;
+
 
     @Transactional
     public UserResponse createUser(RegisterRequest request)
@@ -44,18 +44,17 @@ public class UserService
     public void changePassword(Integer userId, ChangePasswordRequest request)
     {
         User user = userProvider.getUserFromId(userId);
-        if(!user.getPassword().equals(request.getCurrentPassword()))
+
+        if(!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword()))
             throw new PasswordMismatchException();
 
-        if(user.getPassword().equals(request.getNewPassword()))
+        if(passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
             throw new DuplicatedPasswordException();
 
         if(!request.getNewPassword().equals(request.getConfirmNewPassword()))
             throw new PasswordMismatchException();
 
-        //hashing the new password
-
-        user.setPassword(request.getNewPassword());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
     public List<UserResponse> getAllUsers()

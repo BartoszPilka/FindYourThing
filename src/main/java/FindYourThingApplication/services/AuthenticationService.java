@@ -40,6 +40,8 @@ public class AuthenticationService
         user.setStatus(UserStatus.ACTIVE);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER);
+        user.setTotalGradeSum(0L);
+        user.setReviewCount(0);
         User saved = userRepository.save(user);
 
         return new AuthenticationResponse(
